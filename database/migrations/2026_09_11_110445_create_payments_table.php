@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('payments', function (Blueprint $table) {
             $table->id()->autoIncrement();
-            $table->string('name')->unique();
-            $table->string('description');
+            $table->string('payment_method');
+            $table->string('payment_status')->default('pending');
+            $table->decimal('total_amount, 10, 2');
+            $table->timestamp('paid_at')->default(null);
+            $table->foreignId('order_id')->unique()->constrained('orders');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('payments');
     }
 };
