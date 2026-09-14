@@ -14,4 +14,8 @@ class Payment extends Model
         'paid_at',
         'order_id',
     ];
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }
