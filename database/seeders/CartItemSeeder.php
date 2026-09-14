@@ -14,16 +14,16 @@ class CartItemSeeder extends Seeder
     {
         $cartitems =
             [
-                ['cart_id' => 1, 'product_id' => 1, 'quantity' => 2],
-                ['cart_id' => 1, 'product_id' => 3, 'quantity' => 1],
-                ['cart_id' => 1, 'product_id' => 5, 'quantity' => 3],
-                ['cart_id' => 2, 'product_id' => 2, 'quantity' => 1],
-                ['cart_id' => 2, 'product_id' => 4, 'quantity' => 2],
-                ['cart_id' => 2, 'product_id' => 6, 'quantity' => 1],
-                ['cart_id' => 3, 'product_id' => 7, 'quantity' => 4],
-                ['cart_id' => 3, 'product_id' => 8, 'quantity' => 1],
-                ['cart_id' => 4, 'product_id' => 9, 'quantity' => 2],
-                ['cart_id' => 4, 'product_id' => 10, 'quantity' => 5],
+                ['id' => 1,'cart_id' => 1, 'product_id' => 1, 'quantity' => 2],
+                ['id' => 2,'cart_id' => 1, 'product_id' => 3, 'quantity' => 1],
+                ['id' => 3,'cart_id' => 1, 'product_id' => 5, 'quantity' => 3],
+                ['id' => 4,'cart_id' => 2, 'product_id' => 2, 'quantity' => 1],
+                ['id' => 5,'cart_id' => 2, 'product_id' => 4, 'quantity' => 2],
+                ['id' => 6,'cart_id' => 2, 'product_id' => 6, 'quantity' => 1],
+                ['id' => 7,'cart_id' => 3, 'product_id' => 7, 'quantity' => 4],
+                ['id' => 8,'cart_id' => 3, 'product_id' => 8, 'quantity' => 1],
+                ['id' => 9,'cart_id' => 4, 'product_id' => 9, 'quantity' => 2],
+                ['id' => 10,'cart_id' => 4, 'product_id' => 10, 'quantity' => 5],
             ];
             foreach ($cartitems as $cartitem) 
             {

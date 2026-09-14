@@ -23,10 +23,10 @@ class DatabaseSeeder extends Seeder
             OrderSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
-            CartSeeder::class,           
-            CartItemSeeder::class,
-            PaymentSeeder::class,
+            CartSeeder::class,     
+            CartItemSeeder::class, 
             OrderItemSeeder::class,
+            PaymentSeeder::class,
         ]);
     }
 }
