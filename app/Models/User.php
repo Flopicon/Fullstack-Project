@@ -26,8 +26,19 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            
             'password' => 'hashed',
         ];
     }
+    public function orders(){
+        return $this->hasmany(Order::class);
+    }
+    public function carts(){
+        return $this->belongsTo(Cart::class);
+    }
+    public function addresses(){
+        return $this->hasMany(Address::class);
+    }
 }
+
 

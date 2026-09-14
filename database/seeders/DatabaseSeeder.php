@@ -17,13 +17,16 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
         $this->call([
-            AddressSeeder::class
+            UserSeeder::class,
+            AddressSeeder::class,
+            OrderSeeder::class,
+            CategorySeeder::class,
+            ProductSeeder::class,
+            CartSeeder::class,           
+            CartItemSeeder::class,
+            PaymentSeeder::class,
+            OrderItemSeeder::class,
         ]);
     }
 }
