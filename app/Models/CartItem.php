@@ -12,4 +12,17 @@ class CartItem extends Model
         'product_id',
         'quantity',
     ];
+
+    
+    // A cart item belongs to a specific cart
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
+    }
+
+    // A cart item references a product
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }
