@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id()->autoIncrement();
             $table->string('payment_method');
             $table->string('payment_status')->default('pending');
-            $table->decimal('total_amount, 10, 2');
-            $table->timestamp('paid_at')->default(null);
+            $table->decimal('total_amount', 10, 2);
+            $table->timestamp('paid_at')->nullable();
             $table->foreignId('order_id')->unique()->constrained('orders');
             $table->timestamps();
         });
