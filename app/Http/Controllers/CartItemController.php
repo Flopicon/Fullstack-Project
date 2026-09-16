@@ -8,8 +8,13 @@ use App\Models\CartItem;
 
 class CartItemController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // $search = $request-> input('search');
+        // $cartItem = CartItem::with('product')->when($search, function($query, $search){
+        //     return $query->where('name','LIKE',"%{$search}%");
+        // })
+        // ->get();
         $cartItems = CartItem::all();
         return $cartItems;
     }

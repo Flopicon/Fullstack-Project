@@ -7,10 +7,31 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Product::all();
-        return $products;
+        //sort dynamic
+        // $sortBy = $request->input('sortBy');
+        // $sortDir = $request->input('sortDir');
+
+        //sort static
+        $sortBy = $request->query('sortBy', 'id');
+        $sortDir = $request ->query ('sortDir', 'desc');
+
+
+        //search and relationship
+        $search = $request->input('search');
+        $product = Product::with('category')->when($search, function ($query, $search) {
+            return $query->where('name', 'LIKE', "%{$search}%");
+        })
+            //static & dynamic
+            ->orderBy($sortBy, $sortDir)
+            //search
+            ->get();
+        return response()->json($product);
+
+
+        // $products = Product::all();
+        // return $products;
     }
 
     public function store(Request $request)
