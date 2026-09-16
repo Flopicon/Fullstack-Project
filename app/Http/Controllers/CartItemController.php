@@ -15,21 +15,35 @@ class CartItemController extends Controller
     }
     public function store(Request $request)
     {
-        $validate = $request->validate([
-            'cart_id' => 'required|exists:cart_id',
-            'product_id' => 'required|exists:products,id',
-            'quantity'   => 'required|integer|min:1',
-        ]);
-        $cartItem = CartItem::create([
-            'cart_id' => $validate['cart_id'],
-            'product_id' => $validate['product_id'],
-            'quantity' => $validate['quantity'],
-        ]);
-        return $cartItem;
+        try 
+        {
+             $validate = $request->validate([
+                'cart_id' => 'required|exists:carts,id',
+                'product_id' => 'required|exists:products,id',
+                'quantity'   => 'required|integer|min:1',
+            ]);
+            $cartItem = CartItem::create([
+                'cart_id' => $validate['cart_id'],
+                'product_id' => $validate['product_id'],
+                'quantity' => $validate['quantity'],
+            ]);
+            return $cartItem;
+
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'message'  => $e->getMessage()
+            ], 500);
+        }
+
+
+          
+      
+      
     }
     public function show(string $id)
     {
-        $cartItem = CartItem::findOrFailI($id);
+        $cartItem = CartItem::findOrFail($id);
         return $cartItem;
     }
     public function update(Request $request, string $id)

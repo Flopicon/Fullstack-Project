@@ -1,15 +1,14 @@
 <?php
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProductController;
 
-Route::group(['prefix'=> 'prodcut'], function(){
-    
-    //Matches GET: /product
-    Route::get('/', function(){
-    return 'index product';
-});
-    //Matches GET:/product/{id}
-    Route::get('/{id}', function($id){
-        return 'show product: ' . $id;
-    });
+Route::group(['prefix' => 'product'], function () {
+    Route::get('/', [ProductController::class, 'index']);
+    Route::get('/{id}', [ProductController::class, 'show']);
+    Route::post('/', [ProductController::class, 'store']);
+    Route::put('/{id}', [ProductController::class, 'update']);
+    Route::delete('/{id}', [ProductController::class, 'destroy']);
+
 });
