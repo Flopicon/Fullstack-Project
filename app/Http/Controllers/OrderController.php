@@ -8,26 +8,34 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     // Get all orders
-    public function index()
+   public function index(Request $request)
     {
-        try {
-            $orders = Order::with([
-                'user',
-                'address',
-                'payment',
-                'orderItems'
-            ])->get();
+        $search = $request->input('search');
+        $userId = $request->input('user_id'); // Capture user_id filter
 
-            return response()->json([
-                'message' => 'Orders retrieved successfully',
-                'data' => $orders
-            ], 200);
+        // ==== dynamic ====
+        $sortBy = $request->input('sortBy');
+        $sortDir = $request->input('sortDir');
 
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        // ==== static =====
+        // $sortBy = $request->query('sortBy', 'id');
+        // $sortDir = $request->query('sortDir', 'desc');
+
+        // Get limit for pagination (default to 10 if not provided)
+        $limit = $request->query('limit', 10);
+
+        // Combine filters, relationship loading, sorting, and pagination
+        $orders = Order::with(['users', 'order_items'])
+            ->when($search, function($query, $search) {
+                return $query->where('status', 'LIKE', "%{$search}%");
+            })
+            ->when($userId, function($query, $userId) {
+                return $query->where('user_id', $userId);
+            })
+            ->orderBy($sortBy ?? 'id', $sortDir ?? 'desc')
+            ->paginate($limit);
+
+        return response()->json($orders);
     }
 
     // Get one order
