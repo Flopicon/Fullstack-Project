@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\User;
 
 class Cart extends Model
 {
@@ -13,7 +14,7 @@ class Cart extends Model
         public function cart_items(){
             return $this->hasmany(CartItem::class);
         }
-        public function users(){
+        public function user(){
             return $this->belongsTo(User::class);
         }
 }

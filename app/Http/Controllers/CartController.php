@@ -7,11 +7,67 @@ use App\Models\Cart;
 
 class CartController extends Controller
 {
-    public function index()
+    // Get all carts
+    public function index(Request $request)
     {
-        $cart = Cart::all();
-        return $cart;
+        try {
+            // Search
+            $search = $request->input('search');
+
+            // Filter by user
+            $userId = $request->input('user_id');
+
+            // Sort
+            $sortBy = $request->input('sortBy');
+            $sortDir = $request->input('sortDir');
+
+            // Limit
+            $limit = $request->query('limit', 10);
+
+            $carts = Cart::with('user')
+                ->when($search, function ($query, $search) {
+                    return $query->where('id', 'LIKE', "%{$search}%");
+                })
+                ->when($userId, function ($query, $userId) {
+                    return $query->where('user_id', $userId);
+                })
+                ->orderBy($sortBy ?? 'id', $sortDir ?? 'desc')
+                ->paginate($limit);
+
+            return response()->json($carts);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
+
+    // Get one cart
+    public function show(string $id)
+    {
+        try {
+            $cart = Cart::with('user')->find($id);
+
+            if (!$cart) {
+                return response()->json([
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            return response()->json([
+                'message' => 'Cart retrieved successfully',
+                'data' => $cart
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Create cart
     public function store(Request $request)
     {
         try {
@@ -23,7 +79,10 @@ class CartController extends Controller
                 'user_id' => $validate['user_id'],
             ]);
 
-            return $cart;
+            return response()->json([
+                'message' => 'Cart created successfully',
+                'data' => $cart
+            ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -31,25 +90,59 @@ class CartController extends Controller
             ], 500);
         }
     }
-    public function show(string $id)
-    {
-        $cart = Cart::findOrFail($id);
-        return $cart;
-    }
 
+    // Update cart
     public function update(Request $request, string $id)
     {
-        $validate = $request->validate([
-            'user_id' => 'sometimes|exists:users,id',
-        ]);
+        try {
+            $validate = $request->validate([
+                'user_id' => 'sometimes|exists:users,id',
+            ]);
 
-        $cart = Cart::findOrFail($id);
-        $cart->update($validate);
-        return $cart;
+            $cart = Cart::find($id);
+
+            if (!$cart) {
+                return response()->json([
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            $cart->update($validate);
+
+            return response()->json([
+                'message' => 'Cart updated successfully',
+                'data' => $cart
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
+    // Delete cart
     public function destroy(string $id)
     {
-        $cart = Cart::findOrFail($id)->delete();
+        try {
+            $cart = Cart::find($id);
+
+            if (!$cart) {
+                return response()->json([
+                    'message' => 'Cart not found'
+                ], 404);
+            }
+
+            $cart->delete();
+
+            return response()->json([
+                'message' => 'Cart deleted successfully'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
