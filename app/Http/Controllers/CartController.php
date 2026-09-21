@@ -7,7 +7,7 @@ use App\Models\Cart;
 
 class CartController extends Controller
 {
-    // Get all carts
+    // Get all carts + search + filter + sort + pagination
     public function index(Request $request)
     {
         try {
@@ -18,11 +18,11 @@ class CartController extends Controller
             $userId = $request->input('user_id');
 
             // Sort
-            $sortBy = $request->input('sortBy');
-            $sortDir = $request->input('sortDir');
+            $sortBy = $request->input('sortBy', 'id');
+            $sortDir = $request->input('sortDir', 'desc');
 
             // Limit
-            $limit = $request->query('limit', 10);
+            $limit = $request->input('limit', 10);
 
             $carts = Cart::with('user')
                 ->when($search, function ($query, $search) {
@@ -31,7 +31,7 @@ class CartController extends Controller
                 ->when($userId, function ($query, $userId) {
                     return $query->where('user_id', $userId);
                 })
-                ->orderBy($sortBy ?? 'id', $sortDir ?? 'desc')
+                ->orderBy($sortBy, $sortDir)
                 ->paginate($limit);
 
             return response()->json($carts);
@@ -75,14 +75,15 @@ class CartController extends Controller
                 'user_id' => 'required|exists:users,id',
             ]);
 
-            $cart = Cart::create([
+            // One cart per user
+            $cart = Cart::firstOrCreate([
                 'user_id' => $validate['user_id'],
             ]);
 
             return response()->json([
-                'message' => 'Cart created successfully',
+                'message' => 'Cart created/retrieved successfully',
                 'data' => $cart
-            ], 201);
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
