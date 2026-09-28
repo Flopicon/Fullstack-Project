@@ -71,11 +71,12 @@ class UserController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $validate = $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|email',
-            'password' => 'required|string|min:6',
-            'role'     => 'required|string|max:50',
+        try{
+            $validate = $request->validate([
+            'name'     => 'sometimes|string|max:255',
+            'email'    => 'sometimes|email',
+            'password' => 'sometimes|string|min:6',
+            'role'     => 'sometimes|string|max:50',
         ]);
 
         $user = User::findOrFail($id);
@@ -83,6 +84,13 @@ class UserController extends Controller
         $user->update($validate);
 
         return $user;
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+        
     }
 
     public function destroy(string $id)
