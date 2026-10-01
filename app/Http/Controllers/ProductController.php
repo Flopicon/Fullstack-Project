@@ -9,75 +9,108 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        //sort dynamic
-        // $sortBy = $request->input('sortBy');
-        // $sortDir = $request->input('sortDir');
+        try {
+            // 1. Get sort parameters with fallbacks
+            $sortBy = $request->input('sortBy', 'id');
+            $sortDir = $request->input('sortDir', 'desc');
 
-        //sort static
-        $sortBy = $request->query('sortBy', 'id');
-        $sortDir = $request ->query ('sortDir', 'desc');
+            // 2. Read 'per_page' from React (accepts both per_page and perpage, defaults to 10)
+            $perPage = $request->input('per_page', $request->input('perpage', 10));
 
+            // 3. Search filter
+            $search = $request->input('search');
 
-        //search and relationship
-        $search = $request->input('search');
-        $product = Product::with('category')->when($search, function ($query, $search) {
-            return $query->where('name', 'LIKE', "%{$search}%");
-        })
-            //static & dynamic
-            ->orderBy($sortBy, $sortDir)
-            //search
-            ->get();
-        return response()->json($product);
+            $products = Product::with('category')
+                ->when($search, function ($query, $search) {
+                    return $query->where('name', 'LIKE', "%{$search}%");
+                })
+                ->orderBy($sortBy, $sortDir)
+                ->paginate($perPage);
 
-
-        // $products = Product::all();
-        // return $products;
+            return response()->json($products);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request)
     {
-
         try {
-            $validate = $request->validate([
+            $validated = $request->validate([
                 'name'        => 'required|string|max:255',
                 'price'       => 'required|numeric|min:0',
-                'category_id' => 'required|exists:categories,id'
+                'stock'       => 'required|integer|min:0',
+                'skin_type'   => 'nullable|string|max:255',
+                'category_id' => 'nullable|exists:categories,id',
+                'description' => 'nullable|string',
+                'product_image' => 'nullable|string',
             ]);
 
-            $product = Product::create([
-                'name'        => $validate['name'],
-                'price'       => $validate['price'],
-                'category_id' => $validate['category_id']
-            ]);
+            $product = Product::create($validated);
 
-            return $product;
+            return response()->json($product, 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
-                'message'  => $e->getMessage()
+                'message' => $e->getMessage()
             ], 500);
         }
     }
+
     public function show(string $id)
     {
-        $product = Product::findOrFail($id);
-        return $product;
+        $product = Product::with('category')->findOrFail($id);
+        return response()->json($product);
     }
 
     public function update(Request $request, string $id)
     {
-        $validate = $request->validate([
-            'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric|min:0',
-            'category_id' => 'required|exists:categories,id'
-        ]);
+        try {
+            $validated = $request->validate([
+                'name'          => 'sometimes|string|max:255',
+                'price'         => 'sometimes|numeric|min:0',
+                'stock'         => 'sometimes|integer|min:0',
+                'skin_type'     => 'sometimes|nullable|string|max:255',
+                'category_id'   => 'sometimes|nullable|exists:categories,id',
+                'description'   => 'sometimes|nullable|string',
+                'product_image' => 'sometimes|nullable|string',
+            ]);
 
-        $product = Product::findOrFail($id);
-        $product->update($validate);
-        return $product;
+            $product = Product::findOrFail($id);
+            $product->update($validated);
+
+            return response()->json($product);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy(string $id)
     {
-        $product = Product::findOrFail($id)->delete();
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
+
+            return response()->json([
+                'message' => 'Product deleted successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
