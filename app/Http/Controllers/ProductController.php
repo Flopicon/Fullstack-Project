@@ -9,30 +9,33 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        try {
+
+        $product = Product::all();
+        return $product;
+        // try {
             // 1. Get sort parameters with fallbacks
-            $sortBy = $request->input('sortBy', 'id');
-            $sortDir = $request->input('sortDir', 'desc');
+            // $sortBy = $request->input('sortBy', 'id');
+            // $sortDir = $request->input('sortDir', 'desc');
 
             // 2. Read 'per_page' from React (accepts both per_page and perpage, defaults to 10)
-            $perPage = $request->input('per_page', $request->input('perpage', 10));
+            // $perPage = $request->input('per_page', $request->input('perpage', 10));
 
             // 3. Search filter
-            $search = $request->input('search');
+        //     $search = $request->input('search');
 
-            $products = Product::with('category')
-                ->when($search, function ($query, $search) {
-                    return $query->where('name', 'LIKE', "%{$search}%");
-                })
-                ->orderBy($sortBy, $sortDir)
-                ->paginate($perPage);
+        //     $products = Product::with('category')
+        //         ->when($search, function ($query, $search) {
+        //             return $query->where('name', 'LIKE', "%{$search}%");
+        //         })
+        //         ->orderBy($sortBy, $sortDir)
+        //         ->paginate($perPage);
 
-            return response()->json($products);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => $e->getMessage()
-            ], 500);
-        }
+        //     return response()->json($products);
+        // } catch (\Exception $e) {
+        //     return response()->json([
+        //         'message' => $e->getMessage()
+        //     ], 500);
+        // }
     }
 
     public function store(Request $request)
