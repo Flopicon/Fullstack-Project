@@ -10,17 +10,21 @@ class ProductController extends Controller
     public function index(Request $request)
     {
 
-        $product = Product::all();
-        return $product;
+        $perPage = $request->input('per_page', 10);
+
+        // Must include with('category') so React gets category details
+        $products = Product::with('category')->paginate($perPage);
+
+        return response()->json($products);
         // try {
-            // 1. Get sort parameters with fallbacks
-            // $sortBy = $request->input('sortBy', 'id');
-            // $sortDir = $request->input('sortDir', 'desc');
+        // 1. Get sort parameters with fallbacks
+        // $sortBy = $request->input('sortBy', 'id');
+        // $sortDir = $request->input('sortDir', 'desc');
 
-            // 2. Read 'per_page' from React (accepts both per_page and perpage, defaults to 10)
-            // $perPage = $request->input('per_page', $request->input('perpage', 10));
+        // 2. Read 'per_page' from React (accepts both per_page and perpage, defaults to 10)
+        // $perPage = $request->input('per_page', $request->input('perpage', 10));
 
-            // 3. Search filter
+        // 3. Search filter
         //     $search = $request->input('search');
 
         //     $products = Product::with('category')
