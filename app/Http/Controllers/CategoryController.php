@@ -7,9 +7,30 @@ use App\Models\Category;
 
 class CategoryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Category::all();
+        // $categories = Category::all();
+                try {
+            // Search
+            $search = $request->input('search');
+
+            // Limit
+            $limit = $request->input('limit', 10);
+
+            $categories = Category::
+                when($search, function ($query, $search) {
+                    return $query->where('name', 'LIKE', "%{$search}%");
+                })
+                ->paginate($limit);
+
+            return response()->json($categories);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
         return $categories;
     }
 
