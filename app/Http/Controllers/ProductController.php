@@ -9,8 +9,6 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
-
-        
         try {
         // 1. Get sort parameters with fallbacks
         $sortBy = $request->input('sortBy', 'id');

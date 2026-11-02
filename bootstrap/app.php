@@ -3,8 +3,9 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         api: __DIR__.'/../routes/api.php',
@@ -12,8 +13,19 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->statefulApi();
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->shouldRenderJsonWhen(function (Request $request, \Throwable $exception): bool {
+            return $request->is('api/*') || $request->expectsJson();
+        });
     })->create();
+    if (getenv('VERCEL')) {
+    $path = '/tmp/laravel-storage';
+    foreach (['framework/views', 'framework/sessions',
+              'framework/cache/data', 'logs'] as $dir) {
+        @mkdir($path.'/'.$dir, 0775, true);
+    }
+    $app->useStoragePath($path);
+}
+return $app;
